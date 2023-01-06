@@ -7,13 +7,13 @@ import { useStateValue } from './StateProvider';
 
 function Login() {
 
-    const [{}, dispath] = useStateValue();
+    const [{}, dispatch] = useStateValue();
 
     const signIn = () => {
         auth
         .signInWithPopup(provider)
         .then((result) => {
-            dispath ({
+            dispatch ({
                 type: actionTypes.SET_USER,
                 user:result.user,
             });

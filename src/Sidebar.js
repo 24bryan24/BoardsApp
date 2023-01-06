@@ -9,12 +9,15 @@ import SidebarChat from './SidebarChat';
 import { useState } from 'react';
 import db from './firebase';
 import { useStateValue } from './StateProvider';
+import { actionTypes } from "./reducer";
+import MobileChat from './MobileChat.js';
+
 
 function Sidebar() {
 
 
     const [rooms, setRooms] = useState([]);
-    const [{ user }, dispath] = useStateValue();
+    const [{ user, showSidebarChat }, dispatch] = useStateValue();
 
     useEffect(() => {
         const unsubscribe = db.collection('rooms').onSnapshot(Snapshot => (
@@ -31,43 +34,48 @@ function Sidebar() {
         }
     }, []);
 
+  // console.log(showSidebarChat, "showSidebarChat -----");
 
     return (
-        <div className='sidebar'>
+      <div
+        className="sidebar rounded-lg">
+        {showSidebarChat && (
+        <div className="sidebar_header">
+          <Avatar src={user?.photoURL} />
+          <div className="sidebar__headerRight">
+            <IconButton>
+              <DonutLargeIcon />
+            </IconButton>
 
-            <div className='sidebar_header'>
-                <Avatar src={user?.photoURL}/>
-                <div className='sidebar__headerRight'>
+            <IconButton>
+              <ChatIcon />
+            </IconButton>
 
-                    <IconButton>
-                        <DonutLargeIcon />
-                    </IconButton>
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          </div>
+        </div>)}
 
-                    <IconButton>
-                        <ChatIcon />
-                    </IconButton>
+        {showSidebarChat && (
+        <div className="sidebar_search">
+          <div className="sidebar_searchContainer">
+            <SearchOutlinedIcon />
+            <input placeholder="Search or start new chat" type="text" />
+          </div>
+        </div>)}
 
-                    <IconButton>
-                        <MoreVertIcon />
-                    </IconButton>
-
-                </div>
-            </div>
-
-            <div className='sidebar_search'>
-                <div className='sidebar_searchContainer'>
-                    <SearchOutlinedIcon />
-                    <input placeholder='Search or start new chat' type='text' />
-                </div>
-            </div>
-
-            <div className='sidebar_chat'>
-                <SidebarChat addNewChat />
-                {rooms.map(room => (
-                    <SidebarChat key={room.id} id={room.id} name={room.data.name} />
-                ))}
-            </div>
-        </div>
+        {showSidebarChat ? (
+          <div className="sidebar_chat overflow-hidden">
+            <SidebarChat addNewChat />
+            {rooms.map((room) => (
+              <SidebarChat key={room.id} id={room.id} name={room.data.name} />
+            ))}
+          </div>
+        ) : (
+          <MobileChat />
+        )}
+      </div>
     );
 }
 
